@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants, cubicBezier } from "framer-motion";
 
 // ── data ───────────────────────────────────────────────
 const project1 = ["/images/p1.png", "/images/p2.png", "/images/p3.png", "/images/p4.png"];
@@ -29,7 +29,7 @@ const itemCardVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: "easeOut" },
+    transition: { duration: 0.8, ease: cubicBezier(0.4, 0, 0.2, 1) },
   },
 };
 
@@ -74,11 +74,15 @@ function Gallery({ images }: { images: string[] }) {
   const [idx, setIdx] = useState(0);
   return (
     <motion.div variants={itemCardVariants} style={{ position: "relative", flex: 1, overflow: "hidden", minHeight: 260, borderRadius: "4px" }}>
-      <div style={{ display: "flex", height: "100%", transform: `translateX(-${idx * 100}%)`, transition: "transform 0.5s cubic-bezier(.77,0,.175,1)" }}>
+      <motion.div 
+        animate={{ x: `-${idx * 100}%` }}
+        transition={{ duration: 0.5, ease: cubicBezier(0.77, 0, 0.175, 1) }}
+        style={{ display: "flex", height: "100%" }}
+      >
         {images.map((src, i) => (
           <img key={i} src={src} alt="project" style={{ flex: "0 0 100%", width: "100%", height: "100%", objectFit: "cover" }} />
         ))}
-      </div>
+      </motion.div>
       <AnimatedArrow side="left" images={images} setIdx={setIdx} />
       <AnimatedArrow side="right" images={images} setIdx={setIdx} />
     </motion.div>
