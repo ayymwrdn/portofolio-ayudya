@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 // ── data ───────────────────────────────────────────────
 const project1 = ["/images/p1.png", "/images/p2.png", "/images/p3.png", "/images/p4.png"];
@@ -14,22 +14,22 @@ const ARROW_RIGHT_PNG = "/images/panahkanan.png";
 const BG_IMAGE_JPG = "/images/bgpr.jpg";
 
 // ── Variasi Animasi Masuk Layout ──
-const rowContainerVariants = {
+const rowContainerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2, // Jeda antar elemen masuk
+      staggerChildren: 0.2,
     },
   },
 };
 
-const itemCardVariants = {
+const itemCardVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: [0.215, 0.61, 0.355, 1] },
+    transition: { duration: 0.8, ease: "easeOut" },
   },
 };
 
@@ -98,14 +98,12 @@ function AnimatedFlower({ left, right, top, bottom, imageSrc }: { left?: any; ri
     setTimeout(() => setIsClicking(false), 1000);
   };
 
-  // 1. Animasi Klik Ungu (Wind Wave)
   const clickUngu = {
     rotate: [0, -15, 12, -5, 2, 0],
     x: [0, -10, 8, -3, 0],
     transition: { duration: 1 }
   };
 
-  // 2. Animasi Klik Lily (Spring Drop)
   const clickLily = {
     y: [0, 30, -25, 8, 0],
     scaleY: [1, 0.7, 1.2, 0.95, 1],
@@ -114,20 +112,18 @@ function AnimatedFlower({ left, right, top, bottom, imageSrc }: { left?: any; ri
 
   return (
     <motion.div
-      // Animasi MASUK (Initial & Visible)
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
       variants={{
         hidden: { opacity: 0, scale: 0, rotate: -20 },
-        visible: { 
-          opacity: 1, 
-          scale: 1, 
-          rotate: 0, 
-          transition: { type: "spring", stiffness: 100, damping: 10, delay: 0.5 } 
+        visible: {
+          opacity: 1,
+          scale: 1,
+          rotate: 0,
+          transition: { type: "spring", stiffness: 100, damping: 10, delay: 0.5 }
         }
       }}
-      // Animasi KLIK
       animate={isClicking ? (imageSrc === FLOWER_UNG_PNG ? clickUngu : clickLily) : {}}
       onClick={handleClick}
       style={{
@@ -172,7 +168,7 @@ export default function Project() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400&display=swap');`}</style>
       <section style={{ position: "relative", width: "100%", minHeight: "100vh", backgroundImage: `url(${BG_IMAGE_JPG})`, backgroundSize: "cover", backgroundPosition: "center", fontFamily: "'Lato', sans-serif", overflow: "hidden" }}>
         <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 60, padding: "80px 5%", minHeight: "100vh" }}>
-          
+
           {/* Row 1 */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={rowContainerVariants} style={{ position: "relative", display: "flex", gap: 28, alignItems: "stretch", flexWrap: "wrap" }}>
             <AnimatedFlower left="-55px" top="-60px" imageSrc={FLOWER_UNG_PNG} />
