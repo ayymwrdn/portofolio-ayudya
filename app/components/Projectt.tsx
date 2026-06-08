@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 // ── Asset paths ─────────────────────────────────────────
 const FLOWER_UNG_PNG  = "/images/ungu.png";
@@ -77,7 +77,7 @@ const rows: RowConfig[] = [
 ];
 
 // ── Animation variants ──────────────────────────────────
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -85,7 +85,7 @@ const containerVariants = {
   },
 };
 
-const childVariants = {
+const childVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -138,10 +138,15 @@ function AnimatedArrow({
     setTimeout(() => setSparkle(false), 700);
   };
 
+  const arrowVariants: Variants = {
+    rest: { scale: 1 },
+    pressed: { scale: 0.9, opacity: 0.8 },
+  };
+
   return (
     <motion.div
       onClick={handleClick}
-      variants={{ rest: { scale: 1 }, pressed: { scale: 0.9, opacity: 0.8 } }}
+      variants={arrowVariants}
       animate={isPressed ? "pressed" : "rest"}
       transition={{ duration: 0.1 }}
       style={{ ...arrowStyle(side), cursor: "pointer", position: "absolute", zIndex: 10, overflow: "visible" }}
@@ -230,25 +235,6 @@ function GalleryInner({ images }: { images: string[] }) {
   );
 }
 
-// ── Gallery ──────────────────────────────────────────────
-function Gallery({ images }: { images: string[] }) {
-  return (
-    <motion.div
-      variants={childVariants}
-      style={{
-        position: "relative",
-        flex: 1,
-        minWidth: 0,
-        overflow: "hidden",
-        borderRadius: "4px",
-        minHeight: 220,
-      }}
-    >
-      <GalleryInner images={images} />
-    </motion.div>
-  );
-}
-
 // ── AnimatedFlower ──────────────────────────────────────
 function AnimatedFlower({
   left,
@@ -276,8 +262,14 @@ function AnimatedFlower({
     setTimeout(() => setIsAnimating(false), isBunga ? 1200 : 500);
   };
 
-  const shakeVariants = {
-    rest: { x: 0, rotate: 0 },
+  const shakeVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.3, rotate: -25 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      rotate: 0,
+      transition: { type: "spring", stiffness: 80, damping: 12, delay: 0.3 },
+    },
     animate: {
       x: [0, -8, 8, -6, 6, -4, 4, 0],
       rotate: [0, -6, 6, -4, 4, -2, 2, 0],
@@ -285,8 +277,14 @@ function AnimatedFlower({
     },
   };
 
-  const flyVariants = {
-    rest: { x: 0, y: 0, scale: 1, rotate: 0 },
+  const flyVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.3, rotate: -25 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      rotate: 0,
+      transition: { type: "spring", stiffness: 80, damping: 12, delay: 0.3 },
+    },
     animate: {
       x: [0, -25, -60, -30, 15, 0],
       y: [0, -40, -90, -120, -45, 0],
@@ -305,16 +303,7 @@ function AnimatedFlower({
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      variants={{
-        hidden: { opacity: 0, scale: 0.3, rotate: -25 },
-        visible: {
-          opacity: 1,
-          scale: 1,
-          rotate: 0,
-          transition: { type: "spring", stiffness: 80, damping: 12, delay: 0.3 },
-        },
-        ...currentVariants,
-      }}
+      variants={currentVariants}
       animate={isAnimating ? "animate" : undefined}
       style={{
         position: "absolute",
@@ -348,45 +337,6 @@ function AnimatedFlower({
           />
         )}
       </AnimatePresence>
-    </motion.div>
-  );
-}
-
-// ── TextCard ────────────────────────────────────────────
-function TextCard({
-  title,
-  body,
-  bgColor = "#f3dcf9",
-}: {
-  title: string;
-  body: string;
-  bgColor?: string;
-}) {
-  return (
-    <motion.div
-      variants={childVariants}
-      style={{
-        background: bgColor,
-        padding: "20px 20px",
-        flex: "0 0 320px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        gap: 10,
-      }}
-    >
-      <h2
-        style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: 16,
-          fontWeight: 900,
-          color: "#2d1b3d",
-          lineHeight: 1.3,
-        }}
-      >
-        {title}
-      </h2>
-      <p style={{ fontSize: 11, color: "#3d2050", lineHeight: 1.6 }}>{body}</p>
     </motion.div>
   );
 }
@@ -522,7 +472,6 @@ export default function Project() {
             minHeight: "100vh",
           }}
         >
-          {/* Web Header - TETAP ADA */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -538,7 +487,6 @@ export default function Project() {
             />
           </motion.div>
 
-          {/* 4 baris proyek */}
           {rows.map((row, i) => (
             <GalleryRow key={i} row={row} index={i} />
           ))}
