@@ -273,7 +273,7 @@ function AnimatedFlower({
     animate: {
       x: [0, -8, 8, -6, 6, -4, 4, 0],
       rotate: [0, -6, 6, -4, 4, -2, 2, 0],
-      transition: { duration: 0.5, ease: "easeInOut" },
+      transition: { duration: 0.5 },
     },
   };
 
@@ -290,7 +290,7 @@ function AnimatedFlower({
       y: [0, -40, -90, -120, -45, 0],
       scale: [1, 1.1, 0.8, 0.6, 0.9, 1],
       rotate: [0, -12, -25, 12, 8, 0],
-      transition: { duration: 1, ease: "easeInOut" },
+      transition: { duration: 1 },
     },
   };
 
