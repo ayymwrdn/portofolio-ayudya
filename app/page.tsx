@@ -2,7 +2,6 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Profile from "./components/Profile";
 import Exp from "./components/Exp";
-import ProjectSection from "./components/Projectsection";
 import Project0 from "./components/Project0";
 import Projectt from "./components/Projectt";
 import Project4 from "./components/Project4";
@@ -15,17 +14,26 @@ export default function Home() {
   return (
     <main>
       <Navbar />
-      <Hero />
-      <Profile />
-      <Exp />
-      <Project0 />
-      <Projectt />
-      <Project4 />
-      <Project5 />
-      <Project6 />
-      <Project7 />
-      <Galery1 />
-      
+      <section id="home">
+        <Hero />
+      </section>
+      <section id="profile">
+        <Profile />
+      </section>
+      <section id="exp">
+        <Exp />
+      </section>
+      <section id="project">
+        <Project0 />
+        <Projectt />
+        <Project4 />
+        <Project5 />
+        <Project6 />
+        <Project7 />
+      </section>
+      <section id="gallery">
+        <Galery1 />
+      </section>
     </main>
   );
 }
