@@ -101,7 +101,7 @@ function FloatingButterfly() {
         x: [0, 8, -4, 6, 0],
         rotate: [-6, 4, -3, 5, -6],
       }}
-      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+      transition={{ duration: 5, repeat: Infinity, }}
       style={{
         position: "absolute",
         top: "23%",
