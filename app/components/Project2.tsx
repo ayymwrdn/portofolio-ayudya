@@ -3,41 +3,30 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ── types ──────────────────────────────────────────────
-interface GlitterParticle {
-  id: number;
-  x: number;
-  y: number;
-  color: string;
-  size: number;
-  tx: number;
-  ty: number;
-  delay: number;
-}
+// ── data ──
+const STATIC_PHOTOS = [
+  "/images/a1.png",
+  "/images/a2.png",
+  "/images/a3.png",
+  "/images/a4.png",
+  "/images/a5.png",
+];
+const SLIDER_PHOTOS = [
+  "/images/a6.png",
+  "/images/a7.png",
+  "/images/a8.png",
+];
+const BG_IMAGE = "/images/desain2.jpg";
+const FIGMA_LINK = "https://www.figma.com/design/K67s6SRs5WZ6dyIIoqNgy6/UAS?node-id=0-1&t=AoCXtCNVjtzqkjX4-1";
+const ARROW_LEFT = "/images/panahkiri.png";
+const ARROW_RIGHT = "/images/panahkanan.png";
 
-// ── data ───────────────────────────────────────────────
-const project1 = ["/images/o2.png", "/images/o1.png", "/images/o3.png", "/images/o4.png", "/images/o5.png", "/images/o6.png", "/images/o7.png", "/images/o8.png"];
-const project2 = ["/images/t1.png", "/images/t2.png", "/images/t3.png", "/images/t4.png", "/images/t5.png", "/images/t6.png", "/images/t7.png", "/images/t8.png", "/images/t9.png", "/images/t10.png", "/images/t11.png", "/images/t12.png",  "/images/t13.png", "/images/t14.png", "/images/t15.png"];
-
-// Path gambar bunga & kupu-kupu kustom kamu
-const FLOWER_UNG_PNG = "/images/10.png";
-const FLOWER_BUNGA_PNG = "/images/9.png";
-
-// Path gambar panah
-const ARROW_LEFT_PNG = "/images/panahkiri.png";
-const ARROW_RIGHT_PNG = "/images/panahkanan.png";
-
-// Path gambar background
-const BG_IMAGE_JPG = "/images/bgpr.jpg";
-
-// ── Variasi Animasi Masuk Halaman (Framer Motion) ──
+// ── Animations (FIXED) ──
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.15, // Efek muncul bergantian antar komponen dalam satu baris
-    },
+    transition: { staggerChildren: 0.15 },
   },
 };
 
@@ -46,405 +35,211 @@ const childVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.215, 0.61, 0.355, 1] },
   },
 };
 
-
-// ── Animated Arrow Component ──────────────────────────────
-function AnimatedArrow({
-  side,
-  images,
-  setIdx
-}: {
-  side: "left" | "right";
-  images: string[];
-  setIdx: React.Dispatch<React.SetStateAction<number>>;
-}) {
-  const [isPressed, setIsPressed] = useState(false);
-  const [sparkle, setSparkle] = useState(false);
-
-  const handleClick = () => {
-    setIsPressed(true);
-    setSparkle(true);
-    
-    setIdx((i) =>
-      side === "left"
-        ? (i - 1 + images.length) % images.length
-        : (i + 1) % images.length
-    );
-
-    setTimeout(() => setIsPressed(false), 150);
-    setTimeout(() => setSparkle(false), 700);
-  };
-
-  const arrowVariants = {
-    rest: { scale: 1 },
-    pressed: { scale: 0.9, opacity: 0.8 },
-  };
-
-  const imageSrc = side === "left" ? ARROW_LEFT_PNG : ARROW_RIGHT_PNG;
-
-  return (
-    <motion.div
-      onClick={handleClick}
-      variants={arrowVariants}
-      animate={isPressed ? "pressed" : "rest"}
-      transition={{ duration: 0.1 }}
-      style={{
-        ...arrowStyle(side),
-        cursor: "pointer",
-        position: "absolute",
-        zIndex: 10,
-        overflow: "visible", 
-      }}
-    >
-      <img
-        src={imageSrc}
-        alt={`panah ${side}`}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          userSelect: "none",
-        }}
-      />
-      
-      <AnimatePresence>
-        {sparkle && (
-          <motion.div
-            initial={{ scale: 0.8, opacity: 1 }}
-            animate={{ scale: 1.5, opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            style={{
-              position: "absolute",
-              inset: "-15px",
-              borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(216,180,254,0.6) 0%, rgba(246,182,232,0.6) 40%, rgba(255,255,255,0) 80%)",
-              pointerEvents: "none",
-            }}
-          />
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
-
-// ── Gallery component ──────────────────────────────────
-function Gallery({ images }: { images: string[] }) {
-  const [idx, setIdx] = useState(0);
-
-  return (
-    <motion.div 
-      variants={childVariants}
-      style={{ position: "relative", flex: 1, overflow: "hidden", minHeight: 260, borderRadius: "4px" }}
-    >
-      <div
-        style={{
-          display: "flex",
-          height: "100%",
-          transform: `translateX(-${idx * 100}%)`,
-          transition: "transform 0.5s cubic-bezier(.77,0,.175,1)",
-        }}
-      >
-        {images.map((src, i) => (
-          <img
-            key={i}
-            src={src}
-            alt={`photo ${i + 1}`}
-            style={{ flex: "0 0 100%", width: "100%", height: "100%", objectFit: "cover" }}
-            onError={(e) => console.log(`Gambar tidak ditemukan: ${src}`)}
-          />
-        ))}
-      </div>
-
-      <AnimatedArrow side="left" images={images} setIdx={setIdx} />
-      <AnimatedArrow side="right" images={images} setIdx={setIdx} />
-
-      {/* dots */}
-      <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6, zIndex: 10 }}>
-        {images.map((_, i) => (
-          <div
-            key={i}
-            onClick={() => setIdx(i)}
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: idx === i ? "#2d1b3d" : "rgba(255,255,255,0.5)",
-              cursor: "pointer",
-              transition: "background 0.3s",
-            }}
-          />
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
-// ── Animated flower ──
-function AnimatedFlower({
-  left,
-  right,
-  top,
-  bottom,
-  imageSrc = FLOWER_UNG_PNG
-}: {
-  left?: string | number;
-  right?: string | number;
-  top?: string | number;
-  bottom?: string | number;
-  imageSrc?: string;
-}) {
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [sparkle, setSparkle] = useState(false);
-
-  const handleClick = () => {
-    if (isAnimating) return; 
-    
-    setIsAnimating(true);
-    setSparkle(true);
-    
-    setTimeout(() => setSparkle(false), 700);
-    
-    const duration = imageSrc === FLOWER_BUNGA_PNG ? 1200 : 500;
-    setTimeout(() => setIsAnimating(false), duration);
-  };
-
-  // Varian Animasi Goyang untuk 10.png
-  const shakeVariants = {
-    rest: { x: 0, rotate: 0 },
-    animate: {
-      x: [0, -10, 10, -8, 8, -5, 5, 0],
-      rotate: [0, -7, 7, -5, 5, -3, 3, 0],
-      transition: { duration: 0.5, ease: "easeInOut" }
-    }
-  };
-
-  // Varian Animasi Terbang untuk 9.png
-  const flyVariants = {
-    rest: { x: 0, y: 0, scale: 1, rotate: 0 },
-    animate: {
-      x: [0, -30, -80, -40, 20, 0],
-      y: [0, -50, -120, -160, -60, 0],
-      scale: [1, 1.1, 0.8, 0.6, 0.9, 1],
-      rotate: [0, -15, -30, 15, 10, 0],
-      transition: { duration: 1.2, ease: "easeInOut" }
-    }
-  };
-
-  const currentVariants = imageSrc === FLOWER_BUNGA_PNG ? flyVariants : shakeVariants;
-
-  return (
-    <motion.div
-      onClick={handleClick}
-      whileHover={{ scale: isAnimating ? 1 : 1.05 }}
-      variants={{
-        hidden: { opacity: 0, scale: 0.3, rotate: -25 },
-        visible: { 
-          opacity: 1, 
-          scale: 1, 
-          rotate: 0,
-          transition: { type: "spring", stiffness: 80, damping: 12, delay: 0.4 } 
-        },
-        ...currentVariants
-      }}
-      animate={isAnimating ? "animate" : undefined}
-      style={{
-        position: "absolute",
-        left: left,
-        right: right,
-        top: top,
-        bottom: bottom,
-        zIndex: 20, 
-        cursor: "pointer",
-      }}
-    >
-      <img
-        src={imageSrc}
-        alt="Element"
-        style={{
-          width: 150,     
-          height: 150,    
-          objectFit: "contain",
-        }}
-        onError={(e) => console.log(`File tidak ditemukan: ${imageSrc}`)}
-      />
-      <AnimatePresence>
-        {sparkle && (
-          <motion.div
-            initial={{ scale: 0.5, opacity: 1 }}
-            animate={{ scale: 2, opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            style={{
-              position: "absolute",
-              inset: 0,
-              borderRadius: "50%",
-              border: "2px solid rgba(216,180,254,0.8)",
-              pointerEvents: "none",
-            }}
-          />
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
-
-// ── Text card ──────────────────────────────────────────
-function TextCard({ title, body, bgColor = "#f3dcf9" }: { title: string; body: string; bgColor?: string }) {
-  return (
-    <motion.div
-      variants={childVariants}
-      style={{
-        background: bgColor,
-        borderRadius: 0,
-        padding: "36px 32px",
-        flex: "0 0 360px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        gap: 16,
-      }}
-    >
-      <h2
-        style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: 32,
-          fontWeight: 900,
-          color: "#2d1b3d",
-          lineHeight: 1.15,
-        }}
-      >
-        {title.split("\n").map((line, i, arr) => (
-          <span key={i}>
-            {line}
-            {i !== arr.length - 1 && <br />}
-          </span>
-        ))}
-      </h2>
-      <p style={{ fontSize: 14, color: "#3d2050", lineHeight: 1.7 }}>{body}</p>
-    </motion.div>
-  );
-}
-
-// ── Main export ────────────────────────────────────────
-export default function Project() {
-  const [bgLoaded, setBgLoaded] = useState(false);
+// Glitter Stars
+function GlitterStars() {
+  const [stars, setStars] = useState<any[]>([]);
 
   useEffect(() => {
-    const img = new Image();
-    img.src = BG_IMAGE_JPG;
-    img.onload = () => setBgLoaded(true);
-    img.onerror = () => console.error("Background gagal dimuat");
+    const generatedStars = Array.from({ length: 28 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 14 + 8,
+      delay: Math.random() * 3,
+      duration: Math.random() * 2 + 1.5,
+      color: Math.random() > 0.5 ? "#b988d9" : "#d5a3db",
+    }));
+    setStars(generatedStars);
   }, []);
 
+  if (stars.length === 0) return null;
+
+  return (
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
+      {stars.map((star) => (
+        <motion.svg
+          key={star.id}
+          viewBox="0 0 24 24"
+          style={{
+            position: "absolute",
+            left: `${star.x}%`,
+            top: `${star.y}%`,
+            width: star.size,
+            height: star.size,
+          }}
+          animate={{
+            opacity: [0, 1, 0.4, 1, 0],
+            scale: [0.5, 1.2, 0.8, 1.3, 0.5],
+            rotate: [0, 20, -10, 15, 0],
+          }}
+          transition={{
+            duration: star.duration,
+            delay: star.delay,
+            repeat: Infinity,
+            repeatDelay: Math.random() * 2,
+          }}
+        >
+          <polygon
+            points="12,2 13.8,8.5 20.5,8.5 15.3,12.5 17.1,19 12,15 6.9,19 8.7,12.5 3.5,8.5 10.2,8.5"
+            fill={star.color}
+            opacity={0.85}
+          />
+        </motion.svg>
+      ))}
+    </div>
+  );
+}
+
+// ── Standard Photo Frame ──
+function PhotoFrame({ src, index }: { src: string; index: number }) {
+  return (
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={childVariants}
+      transition={{ duration: 0.7 }}
+      whileHover={{ scale: 1.04, y: -6 }}
+      style={{
+        flex: "1 1 0",
+        borderRadius: 16,
+        padding: 5,
+        background: "linear-gradient(135deg, #b988d9 0%, #d5a3db 50%, #b988d9 100%)",
+        boxShadow: "0 8px 32px rgba(185,136,217,0.35)",
+      }}
+    >
+      <div style={{ borderRadius: 12, overflow: "hidden", lineHeight: 0 }}>
+        <img
+          src={src}
+          alt={`Bakery design snapshot ${index + 1}`}
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Slider Frame ──
+function SliderFrame() {
+  const [idx, setIdx] = useState(0);
+  const [pressLeft, setPressLeft] = useState(false);
+  const [pressRight, setPressRight] = useState(false);
+
+  const prev = () => {
+    setPressLeft(true);
+    setTimeout(() => setPressLeft(false), 200);
+    setIdx((i) => (i - 1 + SLIDER_PHOTOS.length) % SLIDER_PHOTOS.length);
+  };
+
+  const next = () => {
+    setPressRight(true);
+    setTimeout(() => setPressRight(false), 200);
+    setIdx((i) => (i + 1) % SLIDER_PHOTOS.length);
+  };
+
+  return (
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={childVariants}
+      transition={{ duration: 0.7 }}
+      style={{
+        flex: "1 1 0",
+        borderRadius: 16,
+        padding: 5,
+        background: "linear-gradient(135deg, #b988d9 0%, #d5a3db 50%, #b988d9 100%)",
+        boxShadow: "0 8px 32px rgba(185,136,217,0.35)",
+        position: "relative",
+      }}
+    >
+      <div style={{ borderRadius: 12, overflow: "hidden", lineHeight: 0, position: "relative" }}>
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={idx}
+            src={SLIDER_PHOTOS[idx]}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.35 }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          />
+        </AnimatePresence>
+
+        <motion.button
+          onClick={prev}
+          animate={pressLeft ? { scale: 0.8 } : { scale: 1 }}
+          whileHover={{ scale: 1.15 }}
+          style={{ position: "absolute", left: 8, bottom: 8, background: "transparent", border: "none", cursor: "pointer", zIndex: 10, width: 36, height: 36 }}
+        >
+          <img src={ARROW_LEFT} alt="Previous slide" style={{ width: "100%", height: "100%" }} />
+        </motion.button>
+
+        <motion.button
+          onClick={next}
+          animate={pressRight ? { scale: 0.8 } : { scale: 1 }}
+          whileHover={{ scale: 1.15 }}
+          style={{ position: "absolute", right: 8, bottom: 8, background: "transparent", border: "none", cursor: "pointer", zIndex: 10, width: 36, height: 36 }}
+        >
+          <img src={ARROW_RIGHT} alt="Next slide" style={{ width: "100%", height: "100%" }} />
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+}
+
+export default function Project5() {
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400&display=swap');
-      `}</style>
-
       <section
         style={{
           position: "relative",
           width: "100%",
           minHeight: "100vh",
-          backgroundImage: `url(${BG_IMAGE_JPG})`,
+          backgroundImage: `url(${BG_IMAGE})`,
           backgroundSize: "cover",
-          backgroundPosition: "center center",
-          backgroundRepeat: "no-repeat",
-          fontFamily: "'Lato', sans-serif",
+          backgroundPosition: "center",
+          fontFamily: "'Poppins', sans-serif",
           overflow: "hidden",
         }}
       >
-        <div
-          style={{
-            position: "relative",
-            zIndex: 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            gap: 60, 
-            paddingLeft: "5%",
-            paddingRight: "5%",
-            paddingTop: "20px",
-            paddingBottom: "80px",
-            minHeight: "100vh",
-          }}
-        >
-          {/* Row 1: Manual Painting */}
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-120px" }}
-            style={{ position: "relative", display: "flex", gap: 28, alignItems: "stretch", flexWrap: "wrap" }}
-          >
-            <AnimatedFlower 
-              left="-55px" 
-              top="-60px" 
-              imageSrc={FLOWER_UNG_PNG}
-            />
+        <GlitterStars />
 
-            <TextCard
-              title={"Manual\npainting"}
-              body="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat"
-            />
-            <Gallery images={project1} />
+        <div style={{ position: "relative", zIndex: 1, padding: "40px 5%", display: "flex", flexDirection: "column", gap: 20 }}>
+          <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true }} style={{ display: "flex", gap: 20 }}>
+            {STATIC_PHOTOS.slice(0, 3).map((src, i) => <PhotoFrame key={i} src={src} index={i} />)}
           </motion.div>
 
-          {/* Row 2: Digital Art */}
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-120px" }}
-            style={{ position: "relative", display: "flex", gap: 28, alignItems: "stretch", flexWrap: "wrap" }}
-          >
-            <AnimatedFlower 
-              right="-37px" 
-              top="-45px" 
-              imageSrc={FLOWER_BUNGA_PNG}
-            />
+          <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true }} style={{ display: "flex", gap: 20 }}>
+            {STATIC_PHOTOS.slice(3, 5).map((src, i) => <PhotoFrame key={i + 3} src={src} index={i + 3} />)}
+            <SliderFrame />
+          </motion.div>
 
-            <Gallery images={project2} />
-            <TextCard
-              title={"Digital\nart"}
-              body="Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo"
-              bgColor="#f3cad8"
-            />
+          <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true }} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <motion.p
+              initial="hidden"
+              animate="visible"
+              variants={childVariants}
+              transition={{ duration: 0.7 }}
+              style={{ fontSize: 15, color: "#2d1b3d", textAlign: "justify", lineHeight: "1.6" }}
+            >
+              A bakery and pastry website design crafted in Figma, featuring a Homepage, About Us, Location, Menu, Review, Order Form, Receipt, and Contact Page. It is thoughtfully structured around a warm, modern, and user-friendly concept to showcase product details, online ordering features, and the brand's unique identity in an engaging, highly accessible layout.
+            </motion.p>
+            <motion.a
+              initial="hidden"
+              animate="visible"
+              variants={childVariants}
+              transition={{ duration: 0.7 }}
+              href={FIGMA_LINK}
+              target="_blank"
+              style={{ fontWeight: 700, color: "#b988d9", textDecoration: "none", borderBottom: "2px solid #b988d9", width: "fit-content" }}
+            >
+              View this design on Figma →
+            </motion.a>
           </motion.div>
         </div>
       </section>
-
-      {!bgLoaded && (
-        <div style={{ position: "fixed", bottom: 10, right: 10, background: "red", color: "white", padding: "5px 10px", fontSize: 12, zIndex: 9999, borderRadius: 5 }}>
-          Background not loaded! Check {BG_IMAGE_JPG}
-        </div>
-      )}
     </>
   );
-}
-
-// ── helpers ────────────────────────────────────────────
-function arrowStyle(side: "left" | "right"): React.CSSProperties {
-  return {
-    position: "absolute",
-    top: "50%",
-    [side]: 16,
-    transform: "translateY(-50%)",
-    zIndex: 10,
-    background: "transparent",
-    border: "none",
-    padding: 0,
-    width: 50,
-    height: 50,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backdropFilter: "none",
-    boxShadow: "none",
-  };
 }
