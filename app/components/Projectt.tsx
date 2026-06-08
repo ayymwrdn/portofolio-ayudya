@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants, useAnimation } from "framer-motion";
 
 // ── Asset paths ─────────────────────────────────────────
 const FLOWER_UNG_PNG  = "/images/ungu.png";
@@ -23,7 +23,7 @@ const galleryT = [
 ];
 
 const galleryO = [
-  "/images/o1.png", "/images/o2.png", "/images/o3.png", "/images/o4.png",
+  "/images/o2.png", "/images/o2.png", "/images/o3.png", "/images/o4.png",
   "/images/o5.png", "/images/o6.png", "/images/o7.png", "/images/o8.png",
 ];
 
@@ -138,16 +138,10 @@ function AnimatedArrow({
     setTimeout(() => setSparkle(false), 700);
   };
 
-  const arrowVariants: Variants = {
-    rest: { scale: 1 },
-    pressed: { scale: 0.9, opacity: 0.8 },
-  };
-
   return (
     <motion.div
       onClick={handleClick}
-      variants={arrowVariants}
-      animate={isPressed ? "pressed" : "rest"}
+      animate={isPressed ? { scale: 0.9, opacity: 0.8 } : { scale: 1, opacity: 1 }}
       transition={{ duration: 0.1 }}
       style={{ ...arrowStyle(side), cursor: "pointer", position: "absolute", zIndex: 10, overflow: "visible" }}
     >
@@ -162,13 +156,12 @@ function AnimatedArrow({
             initial={{ scale: 0.8, opacity: 1 }}
             animate={{ scale: 1.5, opacity: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            transition={{ duration: 0.5 }}
             style={{
               position: "absolute",
               inset: "-15px",
               borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(216,180,254,0.6) 0%, rgba(246,182,232,0.6) 40%, transparent 80%)",
+              background: "radial-gradient(circle, rgba(216,180,254,0.6) 0%, rgba(246,182,232,0.6) 40%, transparent 80%)",
               pointerEvents: "none",
             }}
           />
@@ -236,6 +229,7 @@ function GalleryInner({ images }: { images: string[] }) {
 }
 
 // ── AnimatedFlower ──────────────────────────────────────
+// Pakai useAnimation supaya tidak perlu Variants sama sekali untuk animasi shake/fly
 function AnimatedFlower({
   left,
   right,
@@ -249,62 +243,46 @@ function AnimatedFlower({
   bottom?: string | number;
   imageSrc: string;
 }) {
-  const [isAnimating, setIsAnimating] = useState(false);
+  const controls = useAnimation();
   const [sparkle, setSparkle] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const isBunga = imageSrc === FLOWER_9_PNG || imageSrc === FLOWER_LILY_PNG;
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (isAnimating) return;
     setIsAnimating(true);
     setSparkle(true);
     setTimeout(() => setSparkle(false), 700);
-    setTimeout(() => setIsAnimating(false), isBunga ? 1200 : 500);
-  };
 
-  const shakeVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.3, rotate: -25 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      rotate: 0,
-      transition: { type: "spring", stiffness: 80, damping: 12, delay: 0.3 },
-    },
-    animate: {
-      x: [0, -8, 8, -6, 6, -4, 4, 0],
-      rotate: [0, -6, 6, -4, 4, -2, 2, 0],
-      transition: { duration: 0.5 },
-    },
-  };
+    if (isBunga) {
+      await controls.start({
+        x: [0, -25, -60, -30, 15, 0],
+        y: [0, -40, -90, -120, -45, 0],
+        scale: [1, 1.1, 0.8, 0.6, 0.9, 1],
+        rotate: [0, -12, -25, 12, 8, 0],
+        transition: { duration: 1 },
+      });
+    } else {
+      await controls.start({
+        x: [0, -8, 8, -6, 6, -4, 4, 0],
+        rotate: [0, -6, 6, -4, 4, -2, 2, 0],
+        transition: { duration: 0.5 },
+      });
+    }
 
-  const flyVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.3, rotate: -25 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      rotate: 0,
-      transition: { type: "spring", stiffness: 80, damping: 12, delay: 0.3 },
-    },
-    animate: {
-      x: [0, -25, -60, -30, 15, 0],
-      y: [0, -40, -90, -120, -45, 0],
-      scale: [1, 1.1, 0.8, 0.6, 0.9, 1],
-      rotate: [0, -12, -25, 12, 8, 0],
-      transition: { duration: 1 },
-    },
+    setIsAnimating(false);
   };
-
-  const currentVariants = isBunga ? flyVariants : shakeVariants;
 
   return (
     <motion.div
       onClick={handleClick}
-      whileHover={{ scale: isAnimating ? 1 : 1.05 }}
-      initial="hidden"
-      whileInView="visible"
+      initial={{ opacity: 0, scale: 0.3, rotate: -25 }}
+      whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
       viewport={{ once: true }}
-      variants={currentVariants}
-      animate={isAnimating ? "animate" : undefined}
+      transition={{ type: "spring", stiffness: 80, damping: 12, delay: 0.3 }}
+      whileHover={{ scale: isAnimating ? 1 : 1.05 }}
+      animate={controls}
       style={{
         position: "absolute",
         left,
@@ -356,21 +334,9 @@ function GalleryRow({ row, index }: { row: RowConfig; index: number }) {
           align-items: stretch;
         }
         @media (max-width: 768px) {
-          .gallery-row {
-            flex-direction: column !important;
-            gap: 16px;
-          }
-          .gallery-row .text-card {
-            flex: 0 0 auto !important;
-            width: 100% !important;
-            order: 1 !important;
-          }
-          .gallery-row .gallery-wrap {
-            flex: 0 0 auto !important;
-            width: 100% !important;
-            min-height: 220px !important;
-            order: 2 !important;
-          }
+          .gallery-row { flex-direction: column !important; gap: 16px; }
+          .gallery-row .text-card { flex: 0 0 auto !important; width: 100% !important; order: 1 !important; }
+          .gallery-row .gallery-wrap { flex: 0 0 auto !important; width: 100% !important; min-height: 220px !important; order: 2 !important; }
         }
       `}</style>
 
@@ -380,9 +346,7 @@ function GalleryRow({ row, index }: { row: RowConfig; index: number }) {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-80px" }}
-        style={{
-          flexDirection: galleryLeft ? "row-reverse" : "row",
-        }}
+        style={{ flexDirection: galleryLeft ? "row-reverse" : "row" }}
       >
         <AnimatedFlower
           imageSrc={flower.imageSrc}
@@ -494,19 +458,17 @@ export default function Project() {
       </section>
 
       {!bgLoaded && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 10,
-            right: 10,
-            background: "red",
-            color: "white",
-            padding: "4px 8px",
-            fontSize: 10,
-            zIndex: 9999,
-            borderRadius: 4,
-          }}
-        >
+        <div style={{
+          position: "fixed",
+          bottom: 10,
+          right: 10,
+          background: "red",
+          color: "white",
+          padding: "4px 8px",
+          fontSize: 10,
+          zIndex: 9999,
+          borderRadius: 4,
+        }}>
           Loading bg...
         </div>
       )}
