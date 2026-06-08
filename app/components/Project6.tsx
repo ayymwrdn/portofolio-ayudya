@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 // ── Data ──
 const HP1          = "/images/HP1.png";
 const GD_TEXT      = "/images/gd.png";
-const KUPU         = "/images/kupu3.png";
+const KUPU         = "/images/Kupu3.png";
 
 const containerVariants = {
   hidden: { opacity: 0 },
