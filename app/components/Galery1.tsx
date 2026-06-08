@@ -294,7 +294,7 @@ export default function Galeri() {
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 style={{ borderRadius: "24px", overflow: "hidden", aspectRatio: "1/1", cursor: "pointer" }}
               >
-                <img src="/images/l4.jpg" alt="Paskibraka Pertemuan" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <img src="/images/paskib.png" alt="Paskibraka Pertemuan" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </motion.div>
 
               {/* l5 */}
